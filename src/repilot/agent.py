@@ -63,7 +63,7 @@ class RepoAgent:
             started=time.perf_counter(); event={"tool":name,"args":args}
             try: value=getattr(self.repo,name)(**args); event["status"]="ok"; return value
             except Exception as exc: event.update(status="error", error=str(exc)); raise
-                finally: event["duration_ms"]=round((time.perf_counter()-started)*1000,2); trace.append(event)
+            finally: event["duration_ms"]=round((time.perf_counter()-started)*1000,2); trace.append(event)
         if any(x in q for x in ("功能","作用","能做什么","项目介绍","overview","what does")):
             files = call("list_files", max_files=300)
             top = sorted({p.split("/")[0] for p in files})
