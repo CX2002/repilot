@@ -9,7 +9,7 @@ import shutil
 from urllib.parse import urlparse
 from .config import settings
 
-IGNORED = {".git", ".venv", "venv", "node_modules", "__pycache__", ".pytest_cache", "dist", "build"}
+IGNORED = {".git", ".venv", "venv", "node_modules", "__pycache__", ".pytest_cache", ".repilot", "dist", "build"}
 TEXT_EXTENSIONS = {".py", ".js", ".ts", ".tsx", ".java", ".go", ".rs", ".cpp", ".c", ".h", ".md", ".yaml", ".yml", ".json", ".toml", ".ini", ".sql"}
 
 @dataclass
@@ -67,7 +67,7 @@ class Repository:
     def list_files(self, max_files: int = 500) -> list[str]:
         files = []
         for p in self.root.rglob("*"):
-            if p.is_file() and not p.is_symlink() and not any(part in IGNORED for part in p.relative_to(self.root).parts):
+            if p.is_file() and not p.is_symlink() and not any(part in IGNORED or part.endswith(".egg-info") for part in p.relative_to(self.root).parts):
                 files.append(p.relative_to(self.root).as_posix())
         return sorted(files)[:max_files]
 
