@@ -1,0 +1,17 @@
+[project]
+name = "repilot"
+version = "0.2.0"
+description = "A read-only code repository analysis agent with tool calling and diagnostics"
+requires-python = ">=3.9"
+dependencies = ["fastapi>=0.110,<0.121", "uvicorn[standard]>=0.27", "pydantic>=2.10,<2.11", "pydantic-core>=2.27,<2.28", "httpx>=0.26"]
+
+[project.optional-dependencies]
+mcp = ["mcp>=1.0"]
+
+[project.scripts]
+repilot = "repilot.cli:main"
+repilot-mcp = "repilot.mcp_server:main"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

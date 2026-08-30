@@ -1,0 +1,1 @@
+"""RepoPilot code intelligence agent."""

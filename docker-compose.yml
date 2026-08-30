@@ -1,0 +1,9 @@
+services:
+  repilot:
+    build: .
+    ports: ["8000:8000"]
+    volumes: [".:/workspace:ro"]
+    read_only: true
+    tmpfs: ["/tmp"]
+    environment:
+      REPILOT_TRACE_DIR: /tmp/repilot-traces
