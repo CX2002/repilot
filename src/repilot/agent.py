@@ -86,7 +86,22 @@ class RepoAgent:
             if readme_excerpt:
                 answer += f"\n\nREADME 摘要（{readme}）：\n{readme_excerpt[:3000]}"
         elif any(x in q for x in ("目录","结构","文件","structure")):
-            answer="项目文件结构：\n"+"\n".join(f"- {x}" for x in call("list_files",max_files=200)[:80])
+            files = call("list_files", max_files=500)
+            groups = {}
+            for path in files:
+                parts = path.split("/")
+                key = parts[0]
+                groups.setdefault(key, []).append(path)
+            rows = []
+            for key, members in sorted(groups.items()):
+                if len(members) == 1:
+                    rows.append(f"- {key}")
+                else:
+                    samples = ", ".join(members[:3])
+                    suffix = " ..." if len(members) > 3 else ""
+                    rows.append(f"- {key}/（{len(members)} 个文件；示例：{samples}{suffix}）")
+            answer = "项目结构摘要：\n" + "\n".join(rows[:80])
+            answer += f"\n\n共发现 {len(files)} 个可分析文件；已按顶层目录聚合，避免展开数据集和生成文件。"
         elif any(x in q for x in ("测试","test","失败","fail")):
             code,out=call("run_tests",command="python -m pytest -q" if "python" in q else "pytest -q", timeout=settings.test_timeout); d=diagnose(code,out); suggestion="建议：根据失败堆栈检查相关实现和依赖，修复后由开发者重新运行测试。" if code else "建议：保持现有测试并继续补充边界用例。"; answer=f"测试状态：{d.status}\n失败用例：{', '.join(d.failures) or '无'}\n源码位置：{', '.join(d.locations) or '未解析到'}\n可能原因：{', '.join(d.likely_causes) or '无'}\n{suggestion}\n```text\n{out}\n```"
         elif any(x in q for x in ("diff","变更","修改")):
