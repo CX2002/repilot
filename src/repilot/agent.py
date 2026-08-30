@@ -30,11 +30,16 @@ class RepoAgent:
             self.repo.cleanup()
 
     def _run_llm(self, question: str) -> AgentResult:
-        messages = [{"role":"system","content":"You are RepoPilot, a read-only senior code analyst. Use tools to inspect the repository. Cite claims as path:line. Return a concise report with conclusion, evidence, tests, risks, and (when diagnosis fails) suggested repair steps for the developer to review. Never modify files or claim that you applied a fix."},{"role":"user","content":question}]
+        context = self.index.search(question, 5)
+        rag_citations = [f"{d.path}:{d.start_line}-{d.end_line}" for d in context]
+        rag_context = "\n\nRetrieved repository context (cite these path and line ranges when relevant):\n" + "\n\n".join(
+            f"[{d.path}:{d.start_line}-{d.end_line}]\n{d.text[:5000]}" for d in context
+        ) if context else ""
+        messages = [{"role":"system","content":"You are RepoPilot, a read-only senior code analyst. Use tools to inspect the repository. Cite claims as path:line. Return a concise report with conclusion, evidence, tests, risks, and (when diagnosis fails) suggested repair steps for the developer to review. Never modify files or claim that you applied a fix."},{"role":"user","content":question + rag_context}]
         trace=[]; citations=[]
         for _ in range(self.max_rounds):
             msg = self.llm.complete(messages, definitions()); calls = msg.get("tool_calls", [])
-            if not calls: return AgentResult(msg.get("content", "No answer generated"), citations, trace)
+            if not calls: return AgentResult(msg.get("content", "No answer generated"), list(dict.fromkeys(citations + rag_citations)), trace)
             messages.append(msg)
             for call in calls:
                 args=json.loads(call["function"].get("arguments","{}")); name=call["function"]["name"]
