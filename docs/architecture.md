@@ -2,7 +2,7 @@
 
 ```text
                 ┌──────────────┐
-                │ Web / CLI API │
+                │ REST / CLI API │
                 └──────┬───────┘
                        │ question + repository
                 ┌──────▼───────┐
