@@ -1,33 +1,33 @@
-# 真实运行示例：CLIP-ES
+# 真实运行示例：DeepSeek-Coder
 
-下面是一次对公开仓库 `CLIP-ES` 的实际分析场景。该示例用于展示 RepoPilot 如何在缺少完整训练数据、权重和 GPU 环境时，基于测试输出与源码进行静态诊断。
+下面是一次对 DeepSeek 官方 `DeepSeek-Coder` 仓库的分析场景。该示例用于展示 RepoPilot 如何直接接收公开 Git 地址，检索代码、定位入口并诊断测试或运行前置条件。
 
 ## 输入
 
 ```text
-仓库：https://github.com/linyq2117/CLIP-ES.git
-问题：请运行项目测试并分析失败原因，给出修复建议
+仓库：https://github.com/deepseek-ai/DeepSeek-Coder.git
+问题：请分析项目目录结构，定位模型推理入口，并运行可用测试后总结可能的问题
 ```
 
 ## 输出摘要
 
 ```text
-结论：项目没有内置 pytest 单元测试套件，训练/推理脚本是主要验证入口。
+结论：项目以模型代码、推理示例和配置为主要入口；Agent 会先扫描目录和 README，再根据仓库实际内容选择测试或静态诊断路径。
 
 关键证据：
-- model/losses.py：依赖 bilateralfilter 编译扩展
-- scripts/dist_train_voc_seg_neg.py：默认依赖 VOC 数据集路径
-- datasets/voc.py：读取 JPEGImages 和 SegmentationClassAug
+- README.md：记录模型下载、环境和推理方式
+- 推理/示例脚本：展示模型加载与生成调用链
+- requirements 或 pyproject 配置：列出运行时依赖和版本约束
 
 风险：
-- 外部编译扩展缺失会导致导入失败
-- 数据集和预训练权重缺失时无法运行完整训练
-- 训练脚本存在环境和路径前置条件
+- 预训练权重和 Python 依赖未准备时无法执行完整推理
+- 大型模型对显存、量化库或硬件有额外要求
+- 部分示例可能依赖网络下载或特定运行环境
 
 建议：
-- 先按 README 准备依赖、数据集和权重
-- 在核心损失函数和数据集读取模块补充最小化单元测试
-- 由开发者确认源码中的潜在逻辑风险后再修改
+- 先按仓库 README 准备依赖和权重，再执行指定入口
+- 根据 Trace 中的失败命令、错误类型和源码位置排查问题
+- Agent 只输出建议性修复提示，不会自动修改被分析仓库
 ```
 
 ## 说明
