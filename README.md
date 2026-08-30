@@ -120,10 +120,6 @@ pytest -q
 
 RepoPilot 适合本地开发、团队内部代码问答和面试演示。当前 RAG 为无外部服务的词法检索，公开 Git URL 需要网络，私有仓库认证、真正的向量数据库和公网多租户鉴权尚未实现。
 
-## 简历项目描述
-
-> 基于 Python、FastAPI 和 OpenAI 兼容模型实现只读代码仓库分析 Agent，通过 Function Calling 自动编排代码搜索、文件读取、符号定位、测试执行和 Git Diff 分析工具；实现 TF-IDF 分块检索、测试失败诊断、路径/命令安全校验、Docker 只读部署和结构化 Trace，并提供 MCP stdio Server 与 CLI/API 访问方式。
-
 ## License
 
 MIT，见 [LICENSE](LICENSE)。
