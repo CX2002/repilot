@@ -1,8 +1,16 @@
 # RepoPilot
 
+[![CI](https://github.com/CX2002/repilot/actions/workflows/ci.yml/badge.svg)](https://github.com/CX2002/repilot/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://www.python.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 RepoPilot 是一个面向软件研发的只读代码仓库分析 Agent。它将自然语言问题转换为可追踪的仓库检索、测试执行和 Git 变更分析任务，并输出带文件路径/行号证据的报告。
 
 > RepoPilot 不会自动修改代码；测试诊断失败后只输出建议性的修复提示，供开发者确认。
+
+## 为什么做这个项目
+
+阅读陌生仓库时，开发者通常需要反复切换目录、搜索代码、查看调用位置、运行测试和阅读 Diff。RepoPilot 将这些研发动作封装为可追踪的 Agent 工具调用，目标是缩短代码理解和问题定位时间，同时保留安全边界和可核验的代码证据。
 
 ## 能力
 
@@ -50,6 +58,26 @@ uvicorn repilot.api:app --reload
 repilot /path/to/repository "登录功能在哪里实现？"
 ```
 
+## API 调用
+
+启动服务后调用 `POST /analyze`：
+
+```bash
+curl -X POST http://127.0.0.1:8000/analyze \
+  -H "Content-Type: application/json" \
+  -d '{"repository":"https://github.com/psf/requests.git","question":"HTTP 异常在哪里定义？请给出文件和行号"}'
+```
+
+返回值包含最终报告、引用和结构化 Trace：
+
+```json
+{
+  "answer": "...",
+  "citations": ["src/requests/exceptions.py:12"],
+  "trace": [{"tool":"search_code","status":"ok","duration_ms":18.4}]
+}
+```
+
 ## 模型配置
 
 ```powershell
@@ -91,6 +119,10 @@ pytest -q
 ## 项目定位与限制
 
 RepoPilot 适合本地开发、团队内部代码问答和面试演示。当前 RAG 为无外部服务的词法检索，公开 Git URL 需要网络，私有仓库认证、真正的向量数据库和公网多租户鉴权尚未实现。
+
+## 简历项目描述
+
+> 基于 Python、FastAPI 和 OpenAI 兼容模型实现只读代码仓库分析 Agent，通过 Function Calling 自动编排代码搜索、文件读取、符号定位、测试执行和 Git Diff 分析工具；实现 TF-IDF 分块检索、测试失败诊断、路径/命令安全校验、Docker 只读部署和结构化 Trace，并提供 MCP stdio Server 与 CLI/API 访问方式。
 
 ## License
 
