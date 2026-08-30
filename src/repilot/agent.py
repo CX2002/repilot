@@ -64,7 +64,7 @@ class RepoAgent:
             try: value=getattr(self.repo,name)(**args); event["status"]="ok"; return value
             except Exception as exc: event.update(status="error", error=str(exc)); raise
             finally: event["duration_ms"]=round((time.perf_counter()-started)*1000,2); trace.append(event)
-        if any(x in q for x in ("功能","作用","能做什么","项目介绍","overview","what does")):
+        if any(x in q for x in ("功能", "作用", "能做什么", "项目介绍", "介绍一下", "介绍这个项目", "分析这个项目", "项目概述", "项目情况", "项目是做什么", "用途", "目的", "是什么项目", "overview", "what does")):
             files = call("list_files", max_files=300)
             top = sorted({p.split("/")[0] for p in files})
             readme = next((p for p in files if Path(p).name.lower().startswith("readme")), None)
