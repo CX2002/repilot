@@ -38,3 +38,8 @@ def test_local_repository_is_not_temporary(tmp_path):
     repo = Repository(tmp_path)
     assert repo.is_temporary is False
     repo.cleanup()
+
+def test_remote_url_detection_accepts_github_without_git_suffix():
+    assert Repository._is_remote_url("https://github.com/deepseek-ai/DeepSeek-Coder")
+    assert Repository._is_remote_url("https://github.com/deepseek-ai/DeepSeek-Coder.git")
+    assert not Repository._is_remote_url("https://example.com/docs/project")

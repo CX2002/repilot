@@ -21,7 +21,7 @@ class SearchHit:
 class Repository:
     def __init__(self, root: str | Path):
         self._temp_root = None
-        if isinstance(root, str) and urlparse(root).scheme in ("http", "https", "git") and root.endswith((".git", ".git/")):
+        if isinstance(root, str) and self._is_remote_url(root):
             self._temp_root = Path(tempfile.mkdtemp(prefix="repilot-"))
             try:
                 p = subprocess.run(["git", "clone", "--depth", "1", root, str(self._temp_root)], text=True, capture_output=True, timeout=120)
@@ -38,6 +38,19 @@ class Repository:
             roots = [Path(x).expanduser().resolve() for x in settings.allowed_roots]
             if not any(self.root == r or r in self.root.parents for r in roots):
                 raise ValueError("Repository is outside the configured allowed roots")
+
+    @staticmethod
+    def _is_remote_url(value: str) -> bool:
+        """Recognize cloneable repository URLs, including GitHub URLs without .git."""
+        parsed = urlparse(value)
+        if parsed.scheme not in ("http", "https", "git") or not parsed.netloc or not parsed.path.strip("/"):
+            return False
+        # Most Git servers accept both /owner/repo and /owner/repo.git forms.
+        if parsed.scheme == "git" or parsed.path.rstrip("/").endswith(".git"):
+            return True
+        return parsed.netloc.lower().split(":", 1)[0] in {
+            "github.com", "gitlab.com", "bitbucket.org"
+        }
 
     @property
     def is_temporary(self): return self._temp_root is not None
