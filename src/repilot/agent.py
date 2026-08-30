@@ -63,8 +63,29 @@ class RepoAgent:
             started=time.perf_counter(); event={"tool":name,"args":args}
             try: value=getattr(self.repo,name)(**args); event["status"]="ok"; return value
             except Exception as exc: event.update(status="error", error=str(exc)); raise
-            finally: event["duration_ms"]=round((time.perf_counter()-started)*1000,2); trace.append(event)
-        if any(x in q for x in ("目录","结构","文件","structure")):
+                finally: event["duration_ms"]=round((time.perf_counter()-started)*1000,2); trace.append(event)
+        if any(x in q for x in ("功能","作用","能做什么","项目介绍","overview","what does")):
+            files = call("list_files", max_files=300)
+            top = sorted({p.split("/")[0] for p in files})
+            readme = next((p for p in files if Path(p).name.lower().startswith("readme")), None)
+            readme_excerpt = ""
+            if readme:
+                try:
+                    readme_excerpt = call("read_file", relative=readme, start=1, end=40)
+                    citations.append(f"{readme}:1")
+                except (OSError, ValueError):
+                    pass
+            answer = (
+                "项目功能概览：\n"
+                "- 自动扫描本地目录或公开 Git 仓库，建立可检索的代码上下文；\n"
+                "- 通过代码搜索、符号定位和 RAG 检索回答仓库问题，并返回文件与行号；\n"
+                "- 可在白名单命令范围内运行测试，分析失败日志并给出建议；\n"
+                "- 可总结 Git Diff，并通过 API 或 MCP 提供服务。\n\n"
+                f"仓库主要目录/文件：{', '.join(top[:30]) or '未识别'}"
+            )
+            if readme_excerpt:
+                answer += f"\n\nREADME 摘要（{readme}）：\n{readme_excerpt[:3000]}"
+        elif any(x in q for x in ("目录","结构","文件","structure")):
             answer="项目文件结构：\n"+"\n".join(f"- {x}" for x in call("list_files",max_files=200)[:80])
         elif any(x in q for x in ("测试","test","失败","fail")):
             code,out=call("run_tests",command="python -m pytest -q" if "python" in q else "pytest -q", timeout=settings.test_timeout); d=diagnose(code,out); suggestion="建议：根据失败堆栈检查相关实现和依赖，修复后由开发者重新运行测试。" if code else "建议：保持现有测试并继续补充边界用例。"; answer=f"测试状态：{d.status}\n失败用例：{', '.join(d.failures) or '无'}\n源码位置：{', '.join(d.locations) or '未解析到'}\n可能原因：{', '.join(d.likely_causes) or '无'}\n{suggestion}\n```text\n{out}\n```"

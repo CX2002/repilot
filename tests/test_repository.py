@@ -12,6 +12,14 @@ def test_search_and_agent(tmp_path):
     result = RepoAgent(str(tmp_path)).run("定位 login 函数")
     assert "main.py:1" in result.citations
 
+def test_agent_function_question_returns_overview(tmp_path):
+    (tmp_path / "README.md").write_text("Demo repository\n")
+    (tmp_path / "main.py").write_text("def main():\n    return True\n")
+    from repilot.agent import RepoAgent
+    result = RepoAgent(str(tmp_path)).run("这个项目有什么功能")
+    assert "项目功能概览" in result.answer
+    assert "README.md:1" in result.citations
+
 def test_path_escape(tmp_path):
     repo = Repository(tmp_path)
     try:
