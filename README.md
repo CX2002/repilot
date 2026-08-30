@@ -16,7 +16,7 @@ RepoPilot 是一个面向软件研发的只读代码仓库分析 Agent。它将�
 
 - 本地目录或公开 Git URL 分析（远程仓库自动浅克隆并清理）
 - `list_files`、`search_code`、`read_file`、`find_symbol`、`run_tests`、`git_diff_summary` 工具
-- OpenAI 兼容模型 Function Calling，多轮工具编排；无 API Key 时可离线回退
+- OpenAI 兼容模型 Function Calling，多轮工具编排；必须配置 API Key 才执行自然语言分析
 - README/源码/配置的轻量检索基线
 - 基于 TF-IDF 向量的分块检索，保留 chunk 起止行号；可平滑替换为 Embedding 向量库
 - 独立 MCP stdio Server，可供 Claude Desktop/Cursor 等 MCP 客户端调用
@@ -28,7 +28,7 @@ RepoPilot 是一个面向软件研发的只读代码仓库分析 Agent。它将�
 ## 架构
 
 ```text
-用户问题 → RepoAgent → LLM/本地回退 → Tool Registry → Repository Sandbox
+用户问题 → RepoAgent → LLM → Tool Registry → Repository Sandbox
                                       ↓
                          检索 / 测试 / Diff / Trace
                                       ↓
@@ -92,7 +92,7 @@ $env:REPILOT_BASE_URL="https://api.deepseek.com/v1"
 $env:REPILOT_MODEL="deepseek-chat"
 ```
 
-没有 API Key 时使用本地规则和词法检索模式，适合离线演示。配置模板见 `.env.example`。
+服务需要配置 OpenAI 兼容 API Key（默认使用 DeepSeek）才能执行自然语言分析。未配置时接口会明确返回配置提示，不会输出未经模型理解的检索结果。配置模板见 `.env.example`。
 
 ## MCP Server
 
