@@ -9,16 +9,9 @@ def test_list_and_read(tmp_path):
 def test_search_and_agent(tmp_path):
     (tmp_path / "main.py").write_text("def login():\n    return True\n")
     from repilot.agent import RepoAgent
-    result = RepoAgent(str(tmp_path)).run("定位 login 函数")
-    assert "main.py:1" in result.citations
-
-def test_agent_function_question_returns_overview(tmp_path):
-    (tmp_path / "README.md").write_text("Demo repository\n")
-    (tmp_path / "main.py").write_text("def main():\n    return True\n")
-    from repilot.agent import RepoAgent
-    result = RepoAgent(str(tmp_path)).run("这个项目有什么功能")
-    assert "项目功能概览" in result.answer
-    assert "README.md:1" in result.citations
+    import pytest
+    with pytest.raises(ValueError, match="REPILOT_API_KEY"):
+        RepoAgent(str(tmp_path)).run("定位 login 函数")
 
 def test_path_escape(tmp_path):
     repo = Repository(tmp_path)
@@ -38,9 +31,9 @@ def test_command_allowlist_rejects_shell_syntax(tmp_path):
 def test_trace_contains_status_and_duration(tmp_path):
     (tmp_path / "main.py").write_text("def agent():\n    return True\n")
     from repilot.agent import RepoAgent
-    trace = RepoAgent(str(tmp_path)).run("分析项目目录结构").trace
-    assert trace[0]["status"] == "ok"
-    assert "duration_ms" in trace[0]
+    import pytest
+    with pytest.raises(ValueError, match="REPILOT_API_KEY"):
+        RepoAgent(str(tmp_path)).run("分析项目目录结构")
 
 def test_local_repository_is_not_temporary(tmp_path):
     repo = Repository(tmp_path)

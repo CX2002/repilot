@@ -22,12 +22,10 @@ class RepoAgent:
         self.repo = Repository(root); self.index = VectorIndex(self.repo); self.max_rounds = max_rounds; self.llm = OpenAICompatible()
 
     def run(self, question: str) -> AgentResult:
+        if not self.llm.enabled:
+            raise ValueError("未配置 REPILOT_API_KEY，无法进行自然语言分析。请先配置 DeepSeek API Key。")
         try:
-            if self.llm.enabled:
-                try: return self._run_llm(question)
-                except Exception as exc:
-                    result = self._run_local(question); result.trace.append({"event":"llm_fallback", "error":str(exc)}); return result
-            return self._run_local(question)
+            return self._run_llm(question)
         finally:
             self.repo.cleanup()
 
