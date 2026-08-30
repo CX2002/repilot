@@ -18,7 +18,7 @@ RepoPilot 是一个面向软件研发的只读代码仓库分析 Agent。它将�
 - `list_files`、`search_code`、`read_file`、`find_symbol`、`run_tests`、`git_diff_summary` 工具
 - OpenAI 兼容模型 Function Calling，多轮工具编排；必须配置 API Key 才执行自然语言分析
 - README/源码/配置按代码块切分并建立语义向量索引
-- 标准 RAG：通过 OpenAI 兼容 Embedding 接口召回 Top-K 代码片段，将路径、行号和内容注入模型上下文；未配置 Embedding 服务时使用本地词法检索作为开发降级
+- RAG：通过 OpenAI 兼容 Embedding 接口召回 Top-K 代码片段，将路径、行号和内容注入模型上下文；未配置 Embedding 服务时使用本地词法检索作为开发降级
 - 独立 MCP stdio Server，可供 Claude Desktop/Cursor 等 MCP 客户端调用
 - 测试失败用例、错误类型、源码位置和建议提示
 - Diff 文件、增删行统计和依赖/测试/配置风险信号
