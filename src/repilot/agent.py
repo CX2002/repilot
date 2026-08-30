@@ -55,7 +55,7 @@ class RepoAgent:
             final = self.llm.complete(messages, tools=[])
             return AgentResult(final.get("content", "无法生成最终报告"), citations, trace + [{"event":"max_rounds_summary"}])
         except Exception as exc:
-            return AgentResult("已完成工具检索，但最终总结失败。请查看调用 Trace 和引用。", citations, trace + [{"event":"max_rounds_summary_error", "error":str(exc)}])
+            return AgentResult("已完成部分仓库检索，但最终总结服务暂时不可用。请查看下方 Trace 和引用，或稍后重试。", citations, trace + [{"event":"max_rounds_summary_error", "error":str(exc)}])
 
     def _run_local(self, question: str) -> AgentResult:
         q=question.lower(); trace=[]; citations=[]
