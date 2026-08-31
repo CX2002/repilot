@@ -13,7 +13,7 @@
           ┌────────▼───┐ ┌──▼─────────────┐
           │ Tool Registry│ │ VectorIndex   │
           └────────┬───┘ └──┬─────────────┘
-                   │        │ TF-IDF chunks
+                   │        │ Embedding chunks
           ┌────────▼────────▼┐
           │ Repository Sandbox│
           │ files/tests/git   │

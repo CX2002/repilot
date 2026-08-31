@@ -46,7 +46,7 @@ uvicorn repilot.api:app --reload
 
 打开 <http://127.0.0.1:8000/docs> 调试 API。项目不内置 HTML Web 预览页。
 
-页面支持输入本地仓库路径或公开 Git URL，并分区展示分析报告、代码引用和工具 Trace。
+API 支持提交本地仓库路径或公开 Git URL，并返回分析报告、代码引用和工具 Trace。
 
 请求示例：
 
